@@ -1,0 +1,31 @@
+Andrew's Janky FFT
+
+I wrote this because of some issues I have with FFTW. For one, it's difficult
+to change the FFT precision without going around and changing the names
+of a whole bunch of function calls. It doesn't play nice with std::complex.
+And the license is a bit difficult if you apply GPL special exceptions to
+the code you're linking against. (update: fftw does in fact correctly handle
+std::complex arrays, but the license is still an issue for me.)
+
+Note: This is a radix-2 FFT only, meaning that your input/output size must
+be a power of 2. If not, bad things are currently likely to happen.
+
+Usage couldn't be much simpler:
+
+FFT<float> fft(512);
+float input[512];
+std::complex<float> output[512];
+
+... initialize input ...
+fft.compute(output, input);
+
+Computation is inplace except the initial permutation, which occurs out of
+place to avoid destroying the input array. Also, the bit-reversal permutation
+is only computed once, then stored as a table. This may or may not actually
+improve the speed.
+
+I'm able to get about 10,000 1024-point float FFTs per second on the i7-2760QM
+in my laptop.
+
+Enjoy!
+-Andrew
