@@ -54,8 +54,6 @@ int read_and_process_data( ) {
 
 	/* read in some audio data */
 	while (bytes_read < sizeof(sample_buf)) {
-		fprintf(stderr, "bytes_read=%d\n", bytes_read);
-		fprintf(stderr, "will read %d bytes\n", sizeof(sample_buf) - bytes_read);
 		ret = read(
 			STDIN_FILENO, ((char *) sample_buf) + bytes_read, 
 			sizeof(sample_buf) - bytes_read
