@@ -1,0 +1,3 @@
+g++ -g -W -Wall -O2 -o radar radar.cpp
+arecord -t raw -f FLOAT_LE -r 48000 -c 1 - | ./radar
+Have fun!
