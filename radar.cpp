@@ -70,7 +70,7 @@ int read_and_process_data( ) {
 	}
 
 	/* multiply by window function */
-	for (size_t i = 0; i < N_POINTS / 2; i++) {
+	for (size_t i = 0; i < N_POINTS; i++) {
 		sample_buf[i] *= window(i);
 	}
 
@@ -78,27 +78,28 @@ int read_and_process_data( ) {
 	fft.compute(spectrum, sample_buf);
 
 	/* find maximum and average magnitudes in the spectrum */
-	peak = average = abs(spectrum[0]);
+	average = abs(spectrum[0]);
+
+	peak = 0;
 	peak_loc = 0;
 
 	for (size_t i = 1; i < N_POINTS / 2; i++) { 
 		val = abs(spectrum[i]);
 		average += val;
-		if (val > peak) {
+
+		/* i > 30: only track targets > ~10mph */
+		if (val > peak && i > 30) {
 			peak = val;
-			peak_loc = val;
+			peak_loc = i;
 		}
 	}
-	average /= N_POINTS / 2;
+	average /= (N_POINTS / 2);
 
 	/* if we have a very strong peak then print it */
-	if (peak > 50 * average) {
+	if (peak > 50 * average && peak_loc != 0) {
 		freq = peak_loc / (float) N_POINTS * 48000.0f;
 		speed = freq / 72.023;	/* 72.023 Hz per mph for a K-band gun */
-		fprintf(stderr, "target: %f Hz %f mph\n", freq, speed);
-	} else {
-		fprintf(stderr, "no targets (peak=%f average=%f)\n", peak, average);
-	}
-
+		fprintf(stderr, "target: bin %d / %f Hz %f mph\n", peak_loc, freq, speed);
+	} 
 	return 0;
 }
